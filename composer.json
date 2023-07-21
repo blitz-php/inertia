@@ -1,0 +1,58 @@
+{
+    "name": "blitz-php/inertia",
+    "description": "Adapter Inertia côté serveur pour Blitz PHP",
+    "keywords": ["inertia", "blitz php", "blitz", "ssr"],
+    "license": "MIT",
+    "type": "library",
+    "support": {
+        "issues": "https://github.com/blitz-php/inertia/issues",
+        "source": "https://github.com/blitz-php/inertia"
+    },
+    "authors": [
+        {
+            "name": "Dimitri Sitchet Tomkeu",
+            "email": "devcode.dst@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=8.0",
+        "blitz-php/http-client": "^0.0.1"
+    },
+    "require-dev": {
+        "blitz-php/coding-standard": "^1.0",
+        "phpstan/phpstan": "^1.4.7",
+        "scrutinizer/ocular": "^1.8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "BlitzPHP\\Inertia\\": "src/"
+        }
+    },
+    "scripts": {
+        "analyze": "phpstan analyse",
+        "test": "kahlan",
+        "test-coverage": "kahlan --coverage=3 --reporter=verbose --clover=clover.xml",
+        "cs": [
+            "php-cs-fixer fix --ansi --verbose --dry-run --diff"
+        ],
+        "cs-fix": [
+            "php-cs-fixer fix --ansi --verbose --diff"
+        ]
+    },
+    "scripts-descriptions": {
+        "analyze": "Lance l'analyse statique du code",
+        "test": "Execute les tests unitaires",
+        "cs": "Vérifie les normes de codage",
+        "cs-fix": "Corrige le style de code"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.x-dev"
+        }
+    },
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    }
+}
