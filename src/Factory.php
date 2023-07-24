@@ -12,6 +12,7 @@
 namespace BlitzPHP\Inertia;
 
 use BlitzPHP\Contracts\Http\StatusCode;
+use BlitzPHP\Contracts\Support\Arrayable;
 use BlitzPHP\Http\Redirection;
 use Psr\Http\Message\RequestInterface;
 
@@ -88,8 +89,12 @@ class Factory
         return (string) Helpers::closureCall($this->version);
     }
 
-    public function render($component, array $props = []): string
+    public function render($component, array|Arrayable $props = []): Response
     {
+        if ($props instanceof Arrayable) {
+            $props = $props->toArray();
+        }
+
         return new Response(
             $component,
             array_merge($this->sharedProps, $props),
@@ -101,6 +106,11 @@ class Factory
     public function app(array $page): string
     {
         return Directive::inertia($page);
+    }
+
+    public function head(array $page): string
+    {
+        return Directive::inertiaHead($page);
     }
 
     /**

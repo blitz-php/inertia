@@ -16,7 +16,7 @@ use BlitzPHP\Inertia\Ssr\HttpGateway;
 
 class Services extends BaseServices
 {
-    public static function inertia($shared = true)
+    public static function inertia($shared = true): Factory
     {
         if ($shared) {
             return static::discoverServices(Factory::class, [$shared]);

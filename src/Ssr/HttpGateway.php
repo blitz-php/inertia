@@ -48,11 +48,11 @@ class HttpGateway implements Gateway
      */
     public function dispatch(array $page): ?Response
     {
-        if (! $this->getConfig('ssr.enabled', false)) {
+        if (! $this->getConfig('ssr.enabled', false) || ! (new BundleDetector())->detect()) {
             return null;
         }
 
-        $url = $this->getConfig('ssr.url', 'http://127.0.0.1:13714/render');
+        $url = str_replace('/render', '', $this->getConfig('ssr.url', 'http://127.0.0.1:13714')).'/render';
 
         try {
             $client   = Services::httpclient();

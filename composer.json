@@ -21,13 +21,17 @@
     },
     "require-dev": {
         "blitz-php/coding-standard": "^1.0",
+        "blitz-php/framework": "^0.3",
         "phpstan/phpstan": "^1.4.7",
         "scrutinizer/ocular": "^1.8.1"
     },
     "autoload": {
         "psr-4": {
             "BlitzPHP\\Inertia\\": "src/"
-        }
+        },
+        "files": [
+            "src/Config/helpers.php"
+        ]
     },
     "scripts": {
         "analyze": "phpstan analyse",

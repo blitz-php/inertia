@@ -12,7 +12,9 @@
 namespace BlitzPHP\Inertia;
 
 use BlitzPHP\Contracts\Http\StatusCode;
+use BlitzPHP\Http\Request;
 use BlitzPHP\Http\ServerRequest;
+use BlitzPHP\Utilities\Iterable\Collection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -34,11 +36,17 @@ class Middleware implements MiddlewareInterface
      */
     public function version(ServerRequestInterface $request): ?string
     {
-        if (file_exists($manifest = './mix-manifest.json')) {
+		$app = config('app');
+
+        if (isset($app['asset_url'])) {
+            return md5($app['asset_url']);
+        }
+
+        if (file_exists($manifest = public_path('mix-manifest.json'))) {
             return md5_file($manifest);
         }
 
-        if (file_exists($manifest = './build/manifest.json')) {
+        if (file_exists($manifest = public_path('build/manifest.json'))) {
             return md5_file($manifest);
         }
 
@@ -87,22 +95,31 @@ class Middleware implements MiddlewareInterface
     /**
      * Résout et prépare les erreurs de validation de manière à ce qu'elles soient plus faciles à utiliser côté client.
      */
-    public function resolveValidationErrors(ServerRequestInterface $request): object
+    public function resolveValidationErrors(ServerRequestInterface $request): array
     {
-        Services::session();
-
-        // $errors = Services::validation()->getErrors();
-
-        $errors = null;
-        if (! $errors) {
-            return (object) [];
+        if (!($request instanceof Request)) {
+            return [];
         }
 
-        if ($request->hasHeader('x-inertia-error-bag')) {
-            return (object) [$request->getHeaderLine('x-inertia-error-bag') => $errors];
+        if (! $request->hasSession() || ! $request->session()->has('errors')) {
+            return [];
         }
+        
+        return collect($request->session()->get('errors'))->map(function ($errors) {
+            if (!is_array($errors)) {
+                $errors = ['default' => $errors];
+            }
+            return collect($errors)->toArray();
+        })->pipe(function (Collection $errors) use ($request) {
+			if ($errors->has('default') && $request->header('x-inertia-error-bag')) {
+                return [$request->header('x-inertia-error-bag') => $errors->get('default')];
+            }
+			if ($errors->has('default')) {
+                return $errors->get('default');
+            }
 
-        return (object) $errors;
+            return $errors;
+        })->toArray();
     }
 
     /**
@@ -114,37 +131,28 @@ class Middleware implements MiddlewareInterface
         Inertia::share($this->share($request));
         Inertia::setRootView($this->rootView($request));
 
-        if (! $request->hasHeader('X-Inertia')) {
-            // return Services::response();
-        }
-
         $this->setupDetectors($request);
 
         $response = $handler->handle($request);
+        $response = $response->withHeader('Vary', 'X-Inertia');
 
-        if ($request->getMethod() === 'GET'
-            && $request->getHeaderLine('X-Inertia-Version') !== Inertia::getVersion()
-        ) {
-            // $response = $this->onVersionChange($request, $response);
+        if (! $request->hasHeader('X-Inertia')) {
+            return $response;
         }
 
-        /* if ($response->getStatusCode() === 200 &&
-            empty($response->sendBody())
-        ) {
+        if ($request->getMethod() === 'GET' && $request->getHeaderLine('X-Inertia-Version') !== Inertia::getVersion()) {
+            $response = $this->onVersionChange($request, $response);
+        }
+
+        if ($response->getStatusCode() === StatusCode::OK && empty($response->getBody()->getContents())) {
             $response = $this->onEmptyResponse($request, $response);
         }
-         */
 
-        if (
-            $response->getStatusCode() === StatusCode::FOUND
-            && in_array($request->getMethod(), ['PUT', 'PATCH', 'DELETE'], true)
-        ) {
+        if ($response->getStatusCode() === StatusCode::FOUND && in_array($request->getMethod(), ['PUT', 'PATCH', 'DELETE'], true)) {
             $response = $response->withStatus(StatusCode::SEE_OTHER);
         }
 
-        return $response
-            ->withHeader('Vary', 'Accept')
-            ->withHeader('X-Inertia', 'true');
+        return $response;
     }
 
     /**

@@ -15,22 +15,6 @@ use Closure;
 
 class Helpers
 {
-    /**
-     * @param null $component
-     *
-     * @return Factory|string
-     */
-    public static function inertia($component = null, array $props = [])
-    {
-        $inertia = Services::inertia();
-
-        if ($component) {
-            return $inertia->render($component, $props);
-        }
-
-        return $inertia;
-    }
-
     public static function arrayOnly(array $array, $keys): array
     {
         return array_intersect_key($array, array_flip((array) $keys));
