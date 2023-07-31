@@ -11,7 +11,6 @@
 
 namespace BlitzPHP\Inertia\Ssr;
 
-use BlitzPHP\Config\Config;
 use BlitzPHP\Inertia\Helpers;
 use BlitzPHP\Inertia\Services;
 use Exception;
@@ -35,7 +34,7 @@ class HttpGateway implements Gateway
 
     public function __construct()
     {
-        $config = Config::get('inertia');
+        $config = config('inertia');
         if (empty($config)) {
             $config = $this->defaultConfig;
         }
