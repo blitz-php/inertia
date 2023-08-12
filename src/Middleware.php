@@ -112,10 +112,10 @@ class Middleware implements MiddlewareInterface
             return collect($errors)->toArray();
         })->pipe(function (Collection $errors) use ($request) {
 			if ($errors->has('default') && $request->header('x-inertia-error-bag')) {
-                return [$request->header('x-inertia-error-bag') => $errors->get('default')];
+                return collect([$request->header('x-inertia-error-bag') => $errors->get('default')]);
             }
 			if ($errors->has('default')) {
-                return $errors->get('default');
+                return collect($errors->get('default'));
             }
 
             return $errors;
