@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of Blitz PHP framework - Schild.
+ * This file is part of Blitz PHP framework - Inertia Adapter.
  *
  * (c) 2023 Dimitri Sitchet Tomkeu <devcode.dst@gmail.com>
  *
@@ -41,7 +41,7 @@ class Setup extends Command
      * @var array<string, string>
      */
     protected $options = [
-        '--force'     => 'Créer la classe même si le Middleware existe déjà.',
+        '--force' => 'Créer la classe même si le Middleware existe déjà.',
     ];
 
     public function __construct(Console $app, LoggerInterface $logger)

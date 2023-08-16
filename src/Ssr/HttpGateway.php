@@ -51,7 +51,7 @@ class HttpGateway implements Gateway
             return null;
         }
 
-        $url = str_replace('/render', '', $this->getConfig('ssr.url', 'http://127.0.0.1:13714')).'/render';
+        $url = str_replace('/render', '', $this->getConfig('ssr.url', 'http://127.0.0.1:13714')) . '/render';
 
         try {
             $client   = Services::httpclient();

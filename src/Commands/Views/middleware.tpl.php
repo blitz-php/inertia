@@ -32,7 +32,7 @@ class {class} extends Middleware
     public function share(ServerRequestInterface $request): array
     {
         return array_merge(parent::share($request), [
-            
+
         ]);
     }
 }

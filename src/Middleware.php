@@ -36,7 +36,7 @@ class Middleware implements MiddlewareInterface
      */
     public function version(ServerRequestInterface $request): ?string
     {
-		$app = config('app');
+        $app = config('app');
 
         if (isset($app['asset_url'])) {
             return md5($app['asset_url']);
@@ -97,24 +97,25 @@ class Middleware implements MiddlewareInterface
      */
     public function resolveValidationErrors(ServerRequestInterface $request): array
     {
-        if (!($request instanceof Request)) {
+        if (! ($request instanceof Request)) {
             return [];
         }
 
         if (! $request->hasSession() || ! $request->session()->has('errors')) {
             return [];
         }
-        
-        return collect($request->session()->get('errors'))->map(function ($errors) {
-            if (!is_array($errors)) {
+
+        return collect($request->session()->get('errors'))->map(static function ($errors) {
+            if (! is_array($errors)) {
                 $errors = ['default' => $errors];
             }
+
             return collect($errors)->toArray();
-        })->pipe(function (Collection $errors) use ($request) {
-			if ($errors->has('default') && $request->header('x-inertia-error-bag')) {
+        })->pipe(static function (Collection $errors) use ($request) {
+            if ($errors->has('default') && $request->header('x-inertia-error-bag')) {
                 return collect([$request->header('x-inertia-error-bag') => $errors->get('default')]);
             }
-			if ($errors->has('default')) {
+            if ($errors->has('default')) {
                 return collect($errors->get('default'));
             }
 

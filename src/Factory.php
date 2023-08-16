@@ -14,24 +14,25 @@ namespace BlitzPHP\Inertia;
 use BlitzPHP\Contracts\Http\StatusCode;
 use BlitzPHP\Contracts\Support\Arrayable;
 use BlitzPHP\Http\Redirection;
+use Closure;
 use Psr\Http\Message\RequestInterface;
 
 class Factory
 {
     /**
-     * @var array proprietes partagees par tous les composants
+     * Proprietes partagees par tous les composants
      */
     protected array $sharedProps = [];
 
     /**
-     * @var string page racine
+     * Page racine
      */
     protected string $rootView = 'app';
 
     /**
-     * @var string|null version du manifest.json
+     * Version du manifest.json
      */
-    protected $version;
+    protected string|Closure|null $version = null;
 
     /**
      * Modifie la page racine
@@ -42,9 +43,9 @@ class Factory
     }
 
     /**
-     * @param null $value
+     * Definit les donnees partagees par toute l'application
      */
-    public function share($key, $value = null): void
+    public function share(array|string $key, mixed $value = null): void
     {
         if (is_array($key)) {
             $this->sharedProps = array_merge($this->sharedProps, $key);
@@ -73,10 +74,8 @@ class Factory
 
     /**
      * Modifie la version inertia
-     *
-     * @param mixed $version
      */
-    public function version($version): void
+    public function version(string|Closure $version): void
     {
         $this->version = $version;
     }
@@ -131,23 +130,21 @@ class Factory
 
     /**
      * Redirection
-     *
-     * @param RequestInterface|string $url
      */
-    public function location($url): Redirection
+    public function location(RequestInterface|string $url): Redirection
     {
         if ($url instanceof RequestInterface) {
-            $url = $url->getUri();
+            $url = (string) $url->getUri();
         }
 
         if (Services::request()->hasHeader('X-Inertia')) {
-            Services::session()->set('_blitz_previous_url', $url);
+            Services::session()->setPreviousUrl($url);
 
             return $this->redirectResponse()
                 ->withHeader('X-Inertia-Location', $url)
                 ->withStatus(StatusCode::CONFLICT);
         }
 
-        return $this->redirect((string) $url);
+        return $this->redirect($url);
     }
 }

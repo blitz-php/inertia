@@ -14,10 +14,10 @@ namespace BlitzPHP\Inertia;
 use BlitzPHP\Container\Services;
 use BlitzPHP\Contracts\Support\Arrayable;
 use BlitzPHP\Contracts\Support\Responsable;
-use BlitzPHP\Utilities\Iterable\Arr;
 use BlitzPHP\Formatter\Formatter;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response as HttpResponse;
+use BlitzPHP\Utilities\Iterable\Arr;
 use Closure;
 use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -31,7 +31,7 @@ class Response implements Responsable
         $this->props = $props instanceof Arrayable ? $props->toArray() : $props;
     }
 
-    public function with(string|array $key, mixed $value = null): self
+    public function with(array|string $key, mixed $value = null): self
     {
         if (is_array($key)) {
             $this->props = array_merge($this->props, $key);
@@ -42,7 +42,7 @@ class Response implements Responsable
         return $this;
     }
 
-    public function withViewData(string|array $key, $value = null): self
+    public function withViewData(array|string $key, $value = null): self
     {
         if (is_array($key)) {
             $this->viewData = array_merge($this->viewData, $key);
@@ -84,7 +84,7 @@ class Response implements Responsable
         $props            = ($only && ($partialComponent ?: '') === $this->component)
             ? Helpers::arrayOnly($this->props, $only)
             : $this->props;
-        $props            = $this->resolvePropertyInstances($props, $request);
+        $props = $this->resolvePropertyInstances($props, $request);
 
         return $this->make([
             'component' => $this->component,
