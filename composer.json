@@ -21,7 +21,7 @@
     },
     "require-dev": {
         "blitz-php/coding-standard": "^1.0",
-        "blitz-php/framework": "^0.3",
+        "blitz-php/framework": "^0.10",
         "phpstan/phpstan": "^1.4.7",
         "scrutinizer/ocular": "^1.8.1"
     },

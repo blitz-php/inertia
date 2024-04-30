@@ -12,17 +12,18 @@
 namespace BlitzPHP\Inertia;
 
 use BlitzPHP\Container\Services;
+use BlitzPHP\Contracts\Http\ResponsableInterface;
 use BlitzPHP\Contracts\Support\Arrayable;
-use BlitzPHP\Contracts\Support\Responsable;
 use BlitzPHP\Formatter\Formatter;
 use BlitzPHP\Http\Request;
 use BlitzPHP\Http\Response as HttpResponse;
 use BlitzPHP\Utilities\Iterable\Arr;
 use Closure;
 use GuzzleHttp\Promise\PromiseInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class Response implements Responsable
+class Response implements ResponsableInterface
 {
     protected array $viewData = [];
 
@@ -63,9 +64,14 @@ class Response implements Responsable
     /**
      * {@inheritDoc}
      */
-    public function toResponse($request)
+    public function toResponse(ServerRequestInterface $request): ResponseInterface
     {
         return $this->makeResponse($request);
+    }
+
+    public function getResponse(): ResponseInterface
+    {
+        return $this->response();
     }
 
     public function __toString(): string
